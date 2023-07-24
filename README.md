@@ -34,10 +34,11 @@ The specification for an exponential survival model with a log link
 function is as follows:
 
 $$
+\displaylines{
 T_i|D_i = 1 \sim \mbox{Exponential}(\lambda_i)\\
 T_i|D_i = 0 \sim \mbox{Exponential-CCDF}(\lambda_i)\\
 \lambda_i = 1/\mu_i\\
-\mbox{log } \mu_i = \mbox{...}
+\mbox{log } \mu_i = \mbox{...}}
 $$
 
 Where *T* is treatment time, *D* is whether the bird died (1) or was

@@ -15,10 +15,11 @@ For the survival analysis, we will be using the parameteric approach in `brms` d
 The specification for an exponential survival model with a log link function is as follows:
 
 $$
+\displaylines{
 T_i|D_i = 1 \sim \mbox{Exponential}(\lambda_i)\\
 T_i|D_i = 0 \sim \mbox{Exponential-CCDF}(\lambda_i)\\
 \lambda_i = 1/\mu_i\\
-\mbox{log } \mu_i = \mbox{...}
+\mbox{log } \mu_i = \mbox{...}}
 $$
 
 Where *T* is treatment time, *D* is whether the bird died (1) or was released (0), and "..." is the rest of the model specification. Death (*D* = 1) is modeled with an exponential function, whereas release (*D* = 0) is modeled with a exponential complementary cumulative distribution function (CCDF). CCDF functions are used to model the probability that the even has *not* yet happened. The Weibull and Gamma versions of the model only vary in the distribution family of the top two lines. We will also check whether it makes sense to do the analysis where *D* is whether the bird died (0) or was released (1), so where release is censored rather than death.
