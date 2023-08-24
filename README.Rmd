@@ -6,6 +6,10 @@ output: github_document
 
 ![](https://www.smith.edu/sites/default/files/styles/news_header/public/media/-news/Birdfilm2.jpg?itok=3ymslT-_){width=30%}
 
+```{r setup-chunk, include=FALSE}
+knitr::opts_chunk$set(dev = "png", dpi = 300)
+```
+
 ## Intro
 
 These avian window collision data were collected by Ar Kornreich from various states in the northeastern US. The data are comprised of individual cases of birds that were brought into rehabilitation centers, with information about species, age, sex, injuries, and the number of days that they survived. We will be identifying the major drivers of rehabilitation in two ways: (1) using logistic and Poisson models of release and treatment time, and (2) using a right-censored survival model of treatment time where the censored cases are those where birds died and could not be released.^[An overview of data censoring can be found [here](https://www.youtube.com/watch?v=K-_sblQZ5rE).] All models will be run in `Stan` using `brms`.
@@ -39,12 +43,27 @@ library(dagitty)
 library(ggdag)
 library(survival)
 library(ggfortify)
+library(ggrepel)
 library(flexsurv)
 library(bayesplot)
 library(cowplot)
 
 #load data
 raw_data <- read.csv("Window.Collision.R-Ready.res.csv")
+```
+
+Here is a plot of the familes we have in the data.
+
+```{r, fig.height = 4, fig.width = 6}
+#using code adapted from ar
+wincol <- raw_data[!(raw_data$MayHBC == "TRUE"), ]
+fam_mass <- aggregate(wincol$Avg.Sp.Mass.g, by = list(wincol$Family), FUN = mean, na.rm = TRUE, na.action = NULL, nfrequency = 1)
+fam_mass$Freq <- table(wincol$Family)
+ggplot(fam_mass, aes(x, Freq, label = Group.1)) + 
+  geom_text_repel(size = 3) + scale_x_continuous(trans = "log10") + 
+  scale_y_continuous(trans = "log10", limits = c(0.8, 460)) + 
+  xlab("Average Mass (g) ") + ylab("Number of Cases") + theme_linedraw(base_size = 9) + 
+  annotation_logticks()
 ```
 
 Before moving forward, we should think about the causal structure of the data. Below is a directed acyclic graph (DAG) of the variables for which we have decent coverage. The red node is our outcome variable, survival time, the black nodes comprise the adjustment set needed to estimate the effects of funding, mass, and age on survival time, and the gray nodes are the variables that are unnecessary to include.
@@ -210,9 +229,9 @@ a <- mcmc_intervals(release_model, prob = 0.95, pars = c("b_mass", "b_ageAdult",
   xlim(-0.35, 0.35) + theme_linedraw(base_size = 9) + scale_y_discrete(limits = c("b_funding", "b_ageAdult", "b_mass"), labels = c("Funding", "Age", "Mass")) + 
   geom_vline(xintercept = 0, lty = "dashed") + xlab("") + theme(panel.grid.major.y = element_blank()) + ggtitle("Release ~ ...")
 a$layers[[3]]$aes_params$colour <- "black"
-a$layers[[3]]$aes_params$linewidth <- 0.8
+a$layers[[3]]$aes_params$linewidth <- 0.5
 a$layers[[2]]$aes_params$colour <- "black"
-a$layers[[2]]$aes_params$linewidth <- 0.2
+a$layers[[2]]$aes_params$linewidth <- 0
 a$layers[[4]]$aes_params$fill <- "black"
 a$layers[[4]]$aes_params$colour <- "black"
 
@@ -220,9 +239,9 @@ b <- mcmc_intervals(treatment_model, prob = 0.95, pars = c("b_mass", "b_ageAdult
   xlim(-0.35, 0.35) + theme_linedraw(base_size = 9) + scale_y_discrete(limits = c("b_funding", "b_ageAdult", "b_mass"), labels = c("Funding", "Age", "Mass")) + 
   geom_vline(xintercept = 0, lty = "dashed") + xlab("Effect") + theme(panel.grid.major.y = element_blank()) + ggtitle("Treatment ~ ...")
 b$layers[[3]]$aes_params$colour <- "black"
-b$layers[[3]]$aes_params$linewidth <- 0.8
+b$layers[[3]]$aes_params$linewidth <- 0.5
 b$layers[[2]]$aes_params$colour <- "black"
-b$layers[[2]]$aes_params$linewidth <- 0.2
+b$layers[[2]]$aes_params$linewidth <- 0
 b$layers[[4]]$aes_params$fill <- "black"
 b$layers[[4]]$aes_params$colour <- "black"
 

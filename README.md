@@ -84,6 +84,7 @@ library(dagitty)
 library(ggdag)
 library(survival)
 library(ggfortify)
+library(ggrepel)
 library(flexsurv)
 library(bayesplot)
 library(cowplot)
@@ -92,6 +93,22 @@ library(cowplot)
 raw_data <- read.csv("Window.Collision.R-Ready.res.csv")
 ```
 
+Here is a plot of the familes we have in the data.
+
+``` r
+#using code adapted from ar
+wincol <- raw_data[!(raw_data$MayHBC == "TRUE"), ]
+fam_mass <- aggregate(wincol$Avg.Sp.Mass.g, by = list(wincol$Family), FUN = mean, na.rm = TRUE, na.action = NULL, nfrequency = 1)
+fam_mass$Freq <- table(wincol$Family)
+ggplot(fam_mass, aes(x, Freq, label = Group.1)) + 
+  geom_text_repel(size = 3) + scale_x_continuous(trans = "log10") + 
+  scale_y_continuous(trans = "log10", limits = c(0.8, 460)) + 
+  xlab("Average Mass (g) ") + ylab("Number of Cases") + theme_linedraw(base_size = 9) + 
+  annotation_logticks()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
 Before moving forward, we should think about the causal structure of the
 data. Below is a directed acyclic graph (DAG) of the variables for which
 we have decent coverage. The red node is our outcome variable, survival
@@ -99,7 +116,7 @@ time, the black nodes comprise the adjustment set needed to estimate the
 effects of funding, mass, and age on survival time, and the gray nodes
 are the variables that are unnecessary to include.
 
-![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 According to the results of `adjustmentSets`, we do not need to
 condition on any other variables besides our exposure variables (in
@@ -269,7 +286,7 @@ knitr::kable(trt_rhats, digits = 4, caption = "Treatment Rhats")
 
 Treatment Rhats
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ## Survival Models
 
@@ -295,9 +312,9 @@ freq_wei_alt <- flexsurvreg(Surv(treatment, death) ~ 1, data = imp_data_comp, di
 freq_gam_alt <- flexsurvreg(Surv(treatment, death) ~ 1, data = imp_data_comp, dist = "gamma")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-
 ![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 Only the models where death is censored and release is the outcome fit
 the data, so we will move forward accordingly.
@@ -410,13 +427,13 @@ predicted survival curve is for an individual with mass +2 SDs, 0 SDs or
 +2 SDs around the mean. The other two are for the two categories of age
 and for funding.
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
-
 ![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 [^1]: An overview of data censoring can be found
     [here](https://www.youtube.com/watch?v=K-_sblQZ5rE).
