@@ -9,15 +9,19 @@ style="width:30.0%" />
 ## Intro
 
 These avian window collision data were collected by Ar Kornreich from
-various states in the northeastern US. The data are comprised of
-individual cases of birds that were brought into rehabilitation centers,
-with information about species, age, sex, injuries, and the number of
-days that they survived. We will be identifying the major drivers of
-rehabilitation in two ways: (1) using logistic and Poisson models of
-release and treatment time, and (2) using a right-censored survival
-model of treatment time where the censored cases are those where birds
-died and could not be released.[^1] All models will be run in `Stan`
-using `brms`.
+various states in the northeastern US.
+`Window.Collision.R-Ready.res.csv` contains the original data that is
+used throughout the analysis, and `WinCol_data_Suppmat.xlsx` is an
+additional file that contains full descriptions of injuries and methods
+for injury categorization, locality of each case, and population density
+groupings. The data are comprised of individual cases of birds that were
+brought into rehabilitation centers, with information about species,
+age, sex, injuries, and the number of days that they survived. We will
+be identifying the major drivers of rehabilitation in two ways: (1)
+using logistic and Poisson models of release and treatment time, and (2)
+using a right-censored survival model of treatment time where the
+censored cases are those where birds died and could not be released.[^1]
+All models will be run in `Stan` using `brms`.
 
 For the survival analysis, we will be using the parameteric approach in
 `brms` described by [A. Solomon
