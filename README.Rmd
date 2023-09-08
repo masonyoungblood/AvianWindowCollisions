@@ -59,11 +59,13 @@ Here is a plot of the familes we have in the data.
 wincol <- raw_data[!(raw_data$MayHBC == "TRUE"), ]
 fam_mass <- aggregate(wincol$Avg.Sp.Mass.g, by = list(wincol$Family), FUN = mean, na.rm = TRUE, na.action = NULL, nfrequency = 1)
 fam_mass$Freq <- table(wincol$Family)
-ggplot(fam_mass, aes(x, Freq, label = Group.1)) + 
+family_plot <- ggplot(fam_mass, aes(x, Freq, label = Group.1)) + 
   geom_text_repel(size = 3) + scale_x_continuous(trans = "log10") + 
   scale_y_continuous(trans = "log10", limits = c(0.8, 460)) + 
   xlab("Average Mass (g) ") + ylab("Number of Cases") + theme_linedraw(base_size = 9) + 
   annotation_logticks()
+family_plot
+ggsave(filename = "family_plot.tiff", width = 6, height = 4, device = "tiff", dpi = 600)
 ```
 
 Before moving forward, we should think about the causal structure of the data. Below is a directed acyclic graph (DAG) of the variables for which we have decent coverage. The red node is our outcome variable, survival time, the black nodes comprise the adjustment set needed to estimate the effects of funding, mass, and age on survival time, and the gray nodes are the variables that are unnecessary to include.
@@ -222,7 +224,7 @@ colnames(trt_rhats) <- c("Imputation", "Mass", "Age", "Funding", "Season: Summer
 knitr::kable(trt_rhats, digits = 4, caption = "Treatment Rhats")
 ```
 
-```{r, echo = FALSE, fig.height = 3, fig.width = 10, message = FALSE, warning = FALSE}
+```{r, echo = FALSE, fig.height = 3, fig.width = 10, message = FALSE, warning = FALSE, error = FALSE}
 color_scheme_set("gray")
 
 a <- mcmc_intervals(release_model, prob = 0.95, pars = c("b_mass", "b_ageAdult", "b_funding"), point_size = 2) + 
@@ -254,6 +256,10 @@ d <- plot(d, plot = FALSE)[[1]] + theme_linedraw(base_size = 9) + xlab("Season")
 d$layers[[1]]$aes_params$size <- 2
 
 plot_grid(plot_grid(a, b, nrow = 2), c, d, nrow = 1, labels = c("A", "B"))
+
+tiff("model_plot.tiff", units = "in", width = 10, height = 3, res = 600)
+plot_grid(plot_grid(a, b, nrow = 2), c, d, nrow = 1, labels = c("A", "B"))
+invisible(dev.off())
 ```
 
 ## Survival Models

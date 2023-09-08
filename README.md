@@ -104,14 +104,19 @@ Here is a plot of the familes we have in the data.
 wincol <- raw_data[!(raw_data$MayHBC == "TRUE"), ]
 fam_mass <- aggregate(wincol$Avg.Sp.Mass.g, by = list(wincol$Family), FUN = mean, na.rm = TRUE, na.action = NULL, nfrequency = 1)
 fam_mass$Freq <- table(wincol$Family)
-ggplot(fam_mass, aes(x, Freq, label = Group.1)) + 
+family_plot <- ggplot(fam_mass, aes(x, Freq, label = Group.1)) + 
   geom_text_repel(size = 3) + scale_x_continuous(trans = "log10") + 
   scale_y_continuous(trans = "log10", limits = c(0.8, 460)) + 
   xlab("Average Mass (g) ") + ylab("Number of Cases") + theme_linedraw(base_size = 9) + 
   annotation_logticks()
+family_plot
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+ggsave(filename = "family_plot.tiff", width = 6, height = 4, device = "tiff", dpi = 600)
+```
 
 Before moving forward, we should think about the causal structure of the
 data. Below is a directed acyclic graph (DAG) of the variables for which
