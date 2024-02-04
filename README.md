@@ -1,14 +1,9 @@
 Avian Window Collisions
 ================
-Mason Youngblood
-
-<img
-src="https://www.smith.edu/sites/default/files/styles/news_header/public/media/-news/Birdfilm2.jpg?itok=3ymslT-_"
-style="width:30.0%" />
 
 ## Intro
 
-These avian window collision data were collected by Ar Kornreich from
+These avian window collision data were collected from
 various states in the northeastern US.
 `Window.Collision.R-Ready.res.csv` contains the original data that is
 used throughout the analysis, and `WinCol_data_Suppmat.xlsx` is an
